@@ -1,1 +1,4 @@
 * text=auto eol=lf
+
+# Keep GitHub language stats focused on the app code
+*.blade.php linguist-vendored
