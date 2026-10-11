@@ -6,6 +6,20 @@ Customer segmentation (RFM), explainable churn-risk scoring and LLM-generated re
 
 > Everything is synthetic and offline. Customers come from a seeded generator with known behaviour profiles. The LLM sits behind an interface and is served by a deterministic fake that "reads" the prompt. No real people, no real API calls.
 
+## Screenshots
+
+![dashboard](docs/dashboard.png)
+
+*Customer base: RFM segments with revenue share, average churn risk and revenue at risk.*
+
+![segment](docs/segment.png)
+
+*A segment: customers ranked by churn risk with the main reason, and AI recommendations built from aggregates only.*
+
+![model](docs/model.png)
+
+*Model quality: backtest ROC AUC vs the recency baseline and calibration by risk decile.*
+
 ## What it demonstrates
 
 | Topic | How |
