@@ -1,0 +1,88 @@
+name: ai-retention-analytics
+
+x-php: &php
+  build:
+    context: .
+    dockerfile: docker/php/Dockerfile
+  image: ai-retention-analytics-php
+  volumes:
+    - ./backend:/var/www/html
+  depends_on:
+    mysql:
+      condition: service_healthy
+    redis:
+      condition: service_started
+
+services:
+  app:
+    <<: *php
+    environment:
+      BOOTSTRAP: "1"
+    healthcheck:
+      test: ["CMD", "test", "-f", "/var/www/html/storage/framework/ready"]
+      interval: 5s
+      retries: 60
+
+  # Queue worker: runs LLM recommendation jobs (queue "ai").
+  worker:
+    <<: *php
+    command: php artisan queue:work redis --queue=ai,default --sleep=1 --tries=0 --max-time=3600
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+
+  # Nightly retention:analyze snapshot, weekly backtest (routes/console.php).
+  scheduler:
+    <<: *php
+    command: php artisan schedule:work
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "8082:80"
+    volumes:
+      - ./backend:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      app:
+        condition: service_healthy
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_API_PROXY: http://nginx
+    ports:
+      - "5175:5173"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    depends_on:
+      - nginx
+
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: retention
+      MYSQL_USER: retention
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      retries: 30
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+
+volumes:
+  mysql_data:
+  frontend_node_modules:
