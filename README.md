@@ -188,6 +188,12 @@ frontend/src/pages/              Dashboard, Segment (customers + AI panel), Migr
 
 Implement `App\Ai\Contracts\LlmClient::complete()`: map `LlmRequest` (system prompt + messages) to the provider's chat API and return the text and token usage in `LlmResponse`. Then bind it in `AppServiceProvider` and add the model's price to `retention.ai.pricing`. Caching, budget, schema validation and accounting stay unchanged.
 
+## How this was built
+
+This is a portfolio project. Its architecture is based on production modules I designed and built single-handedly in a commercial SaaS platform. This repository is a clean-room reimplementation: no proprietary code, names or data.
+
+The implementation was written with AI assistance (Claude Code). I defined the requirements and architecture, made the design decisions and reviewed the result. I'm happy to walk through any part of it.
+
 ## Out of scope
 
 - Authentication and multi-tenancy.
