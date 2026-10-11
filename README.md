@@ -1,5 +1,7 @@
 # AI Retention Analytics
 
+[![CI](https://github.com/maxakagaret/ai-retention-analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/maxakagaret/ai-retention-analytics/actions/workflows/ci.yml)
+
 Customer segmentation (RFM), explainable churn-risk scoring and LLM-generated retention campaigns for appointment-based businesses. Built with Laravel 12 and Vue 3 / Quasar on a synthetic customer base.
 
 > Everything is synthetic and offline. Customers come from a seeded generator with known behaviour profiles. The LLM sits behind an interface and is served by a deterministic fake that "reads" the prompt. No real people, no real API calls.
